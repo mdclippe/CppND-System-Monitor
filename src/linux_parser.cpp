@@ -68,26 +68,46 @@ vector<int> LinuxParser::Pids() {
   return pids;
 }
 
-// TODO: Read and return the system memory utilization
-float LinuxParser::MemoryUtilization() {  
-
-  float memtotal = 0.0;
-  float memfree = 0.0;
-  float value = 0.0;
-  std::ifstream stream(kProcDirectory + kMeminfoFilename);
+/// @brief Get the value from a filename based on its key
+/// @tparam T 
+/// @param filename 
+/// @param key : if key is empty, it will return the first value, otherwise the key is used as comparator
+/// @return 
+template<typename T>
+T getValueFromFile(const std::string &filename, const std::string &key)
+{
+  T value = T();
+  std::ifstream stream(filename);
   if (stream.is_open()) {
-    string line;
-    string key;
+    std::string line;
+    std::string readkey;
     while (std::getline(stream, line)) {
       std::istringstream linestream(line);
-      linestream >> key;
-      if (key == "MemTotal:") {
-        linestream >> memtotal;
-      } else if (key == "MemFree:") {
-        linestream >> memfree;
+      // if the key is empty, return the first value
+      if (key == "")
+      {
+        linestream >> value;
+        return value;
+      }
+      else
+      {
+        linestream >> readkey;
+        if (readkey == key) {
+          linestream >> value;
+        }
       }
     }
   }
+  return value;
+}
+
+// Done: Read and return the system memory utilization
+float LinuxParser::MemoryUtilization() {  
+
+  const float memtotal = getValueFromFile<float> (kProcDirectory + kMeminfoFilename, "MemTotal:");
+  const float memfree = getValueFromFile<float> (kProcDirectory + kMeminfoFilename, "MemFree:");
+  float value = 0.0;
+
   if (memtotal == 0 || memtotal < memfree)
     value = 0.0;
   else
@@ -95,8 +115,10 @@ float LinuxParser::MemoryUtilization() {
   return value;
 }
 
-// TODO: Read and return the system uptime
-long LinuxParser::UpTime() { return 0; }
+// Done: Read and return the system uptime
+long LinuxParser::UpTime() { 
+  return getValueFromFile<long>(kProcDirectory + kUptimeFilename, ""); 
+}
 
 // TODO: Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() { return 0; }
@@ -114,11 +136,17 @@ long LinuxParser::IdleJiffies() { return 0; }
 // TODO: Read and return CPU utilization
 vector<string> LinuxParser::CpuUtilization() { return {}; }
 
-// TODO: Read and return the total number of processes
-int LinuxParser::TotalProcesses() { return 0; }
 
-// TODO: Read and return the number of running processes
-int LinuxParser::RunningProcesses() { return 0; }
+// Done: Read and return the total number of processes
+int LinuxParser::TotalProcesses() { 
+  // there was an error in the totalprocess explanation : on the udacity website it states that it resides in the /proc/meminfo file!
+  return getValueFromFile<int>(kProcDirectory + kStatFilename,"processes"); 
+}
+
+// Done: Read and return the number of running processes
+int LinuxParser::RunningProcesses() { 
+  return getValueFromFile<int>(kProcDirectory + kStatFilename,"procs_running"); ; 
+}
 
 // TODO: Read and return the command associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
