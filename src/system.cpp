@@ -22,8 +22,15 @@ system."
 You need to properly format the uptime. Refer to the comments mentioned in
 format. cpp for formatting the uptime.*/
 
+System::System() : kernel_(LinuxParser::Kernel()), operating_system_(LinuxParser::OperatingSystem()) 
+{
+
+}
+
 // TODO: Return the system's CPU
-Processor& System::Cpu() { return cpu_; }
+Processor& System::Cpu() { 
+    return cpu_; 
+}
 
 // Done: Return a container composed of the system's processes
 vector<Process>& System::Processes() { 
@@ -39,13 +46,13 @@ vector<Process>& System::Processes() {
 }
 
 // Done: Return the system's kernel identifier (string)
-std::string System::Kernel() { return LinuxParser::Kernel(); }
+std::string System::Kernel() { return kernel_; }
 
 // Done: Return the system's memory utilization
 float System::MemoryUtilization() { return LinuxParser::MemoryUtilization(); }
 
 // Done: Return the operating system name
-std::string System::OperatingSystem() { return LinuxParser::OperatingSystem(); }
+std::string System::OperatingSystem() { return operating_system_; }
 
 // Done: Return the number of processes actively running on the system
 int System::RunningProcesses() { return LinuxParser::RunningProcesses(); }
