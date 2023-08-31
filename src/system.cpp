@@ -25,8 +25,18 @@ format. cpp for formatting the uptime.*/
 // TODO: Return the system's CPU
 Processor& System::Cpu() { return cpu_; }
 
-// TODO: Return a container composed of the system's processes
-vector<Process>& System::Processes() { return processes_; }
+// Done: Return a container composed of the system's processes
+vector<Process>& System::Processes() { 
+    vector<int> pids = LinuxParser::Pids();
+    processes_.clear();
+    for (auto pid : pids)
+    {
+        auto p = Process(pid);
+        processes_.push_back(p);
+    }
+    std::sort(processes_.rbegin(), processes_.rend());
+    return processes_; 
+}
 
 // Done: Return the system's kernel identifier (string)
 std::string System::Kernel() { return LinuxParser::Kernel(); }
